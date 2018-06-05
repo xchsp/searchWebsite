@@ -1,0 +1,154 @@
+<head>
+    <meta charset="UTF-8">
+    <title>搜索框</title>
+    <style>
+    input,button{
+        outline: none;
+    }
+    form{
+        font-size:0;
+    }
+    input{
+        height: 40px;
+        width: 330px;
+        background-color: #eee;
+        border: none;
+        border-radius: 4px 0 0 4px;
+        padding-left: 10px;
+    }
+    button{
+        height: 40px;
+        width: 110px;
+        background-color: #d24040;
+        border: none;
+        position: relative;
+        border-radius: 0 4px 4px 0;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    input::-webkit-input-placeholder{
+        font-style: italic;
+    }
+    input:-moz-placeholder{
+        font-style: italic;
+    }
+    input:-ms-input-placeholder{
+        font-style: italic;
+    }
+    .triangle{
+        content: "";
+        display: inline-block;
+        border: 6px solid transparent;
+        border-right-color:#d24040;
+        position: absolute;
+        right:100%;
+        top:14px;
+    }
+    </style>
+</head>
+    <body>
+{#        <div class="row text-center">#}
+{#            <h1 class="title">#}
+{#                <img src="{{ url_for("static", filename="bloogle200.png") }}">#}
+{#            </h1>#}
+{#        </div>#}
+            <form class="form-wrapper cf">
+                <input type="text" class="" placeholder="Search here" required />
+                <button  onclick="add_search()">
+                    <i class="triangle"></i>
+                    Search
+                </button>
+{#                <ul class="dataList">#}
+{#                </ul>#}
+            </form>
+
+
+    </body>
+    <script type="text/javascript" src="{{ url_for('static', filename="js/jquery.js") }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename="js/global.js") }}"></script>
+    <script type="text/javascript">
+        var suggest_url = "{{ url_for(".suggest") }}";
+        var search_url = "{{ url_for(".search") }}";
+
+        function removeByValue(arr, val) {
+            for (var i = 0; i < arr.length; i++){
+                if(arr[i] == val){
+                    arr.splice(i, 1);
+                    break;
+                }
+            }
+        }
+        $(function(){
+            $('.searchInput').bind(' input propertychange ',function(){
+                var searchText = $(this).val();
+                var tmpHtml = "";
+                $.ajax({
+                    cache: false,
+                    type: 'get',
+                    dataType:'json',
+                    url:suggest_url+"?s="+searchText,
+                    async: true,
+                    success: function(data) {
+                        for (var i=0;i<data.length;i++){
+                            tmpHtml += '<li><a href="'+search_url+'?q='+data[i]+'">'+data[i]+'</a></li>'
+                        }
+                        $(".dataList").html("");
+                        $(".dataList").append(tmpHtml);
+                        if (data.length == 0){
+                            $('.dataList').hide()
+                        }else {
+                            $('.dataList').show()
+                        }
+                    }
+                });
+            } );
+        })
+    </script>
+    <script type="text/javascript">
+        var searchArr;
+        if(localStorage.search){
+            searchArr = localStorage.search.split(",")
+        }else{
+            searchArr = [];
+        }
+        MapSearch();
+
+        function add_search() {
+            var val = $(".searchInput").val();
+            if (val.length >= 2){
+                KillRepeat(val);
+                localStorage.search = searchArr;
+                MapSearch();
+            }
+            window.location.href=search_url+'?q='+val
+        }
+
+        function MapSearch() {
+            var tmpHtml = "";
+            var arrLen = 0;
+            if (searchArr.length >= 5){
+                arrLen = 5
+            }else{
+                arrLen = searchArr.length
+            }
+            for (var i=0; i < arrLen; i++){
+                tmpHtml += '<a href="'+search_url+'?q='+searchArr[i]+'">'+'</a>'
+            }
+            $(".mySearch .all-search").html(tmpHtml);
+        }
+        function KillRepeat(val) {
+            var kill = 0;
+            for (var i = 0; i < searchArr.length; i++) {
+                if (val === searchArr[i]) {
+                    kill++;
+                }
+            }
+            if (kill < 1) {
+                searchArr.unshift(val);
+            } else {
+                removeByValue(searchArr, val);
+                searchArr.unshift(val)
+            }
+        }
+    </script>

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dataTables.bootstrap.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+{% endblock %}
+{% block content %}
+
+<body>
+<div class="center-block">
+<div class="box">
+    <div class="box-header">
+        <h3 class="page-header">Master爬虫</h3>
+    </div>
+            <div class="box-body">
+              <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                  <th>爬虫名称</th>
+                  <th>爬虫状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for spider in master %}
+                <tr>
+                  <td><a href="{{ url_for(".spider_detail", project=spider[0]) }}">{{ spider[0] }}</a></td>
+                  <td>{{ spider[2] }}</td>
+                    <td><a class="btn btn-sm" href="{{ url_for('.start_master', project=spider[0]) }}"><i class="fa fa-play">start</i></a>
+                    {% if spider[1] %}<a class="btn btn-sm" href="{{ url_for(".stop", project=spider[0], id=spider[1]) }}"><i class="fa fa-remove">stop</i></a>{% endif %}</td></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+            </div>
+</div>
+<div class="box">
+    <div class="box-header">
+        <h3 class="page-header">Slave爬虫</h3>
+    </div>
+            <div class="box-body">
+              <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                  <th>爬虫名称</th>
+                  <th>爬虫状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for spider in slave %}
+                <tr>
+                  <td><a href="{{ url_for('.spider_detail', project=spider[0]) }}">{{ spider[0] }}</a></td>
+                  <td>{{ spider[2] }}</td>
+                    <td><a class="btn btn-sm" href="{{ url_for(".start_slave", project=spider[0]) }}"><i class="fa fa-play">start</i></a>
+                        {% if spider[1] %}<a class="btn btn-sm" href="{{ url_for(".stop", project=spider[0], id=spider[1]) }}"><i class="fa fa-remove">stop</i></a>{% endif %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+            </div>
+</div>
+</div>
+{#        <h3 class="page-header"><a href="{{ url_for(".show_jobs") }}">查看运行记录</a></h3>#}
+</body>
+{% endblock %}
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+{% endblock %}
